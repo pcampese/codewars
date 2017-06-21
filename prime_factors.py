@@ -1,5 +1,11 @@
 # https://www.codewars.com/kata/primes-in-numbers/train/python
 
+# Both methods fail -- to long to execute
+
+##########################################################
+# Method 1 - Passes the sample tests.  Fails the Attempt #
+##########################################################
+
 def primeFactors(n):
 	print('Prime Factors of [{}]'.format(n))
 	prime_divisor = getNextPrimeNumber(1,n)
@@ -91,5 +97,170 @@ def isPrime(n, prime_list = None):
 
 #	print('+ prime? {}'.format(prime))
 #	print
+
+	return prime
+	
+########################################################
+# Method 2 - (Should) work, but fails the sample tests #
+########################################################
+
+def primeFactors(n):
+	print('Prime Factors of [{}]'.format(n))
+
+	# Do number / pime number
+	# Once the division has a remainder, then break
+	# Get the next prime number
+	# Repeat
+	# Once the number reaches 1, then we're all done
+
+	# Define the variables
+
+#	for i in range(1,100):
+#		if (isPrime(i)):
+#			print('{} is Prime'.format(i))
+
+#	for i in range(1,100):
+#		if (isPrimeWithList(i, prime_list)):
+#			print('{} is Prime'.format(i))
+
+#	for i in range(50,100):
+#		if (isPrimeWithStart(i, i // 2)):
+#			print('{} is Prime'.format(i))
+
+	prime_list = createPrimeList(n)
+	prime_list.remove(1)
+#	print('prime_list = {}'.format(prime_list))
+
+	count_of_prime = {}			# Dictionary to save the results
+
+	if not n:	# If no number is provided (to get the prime factors of)
+		n = 1	# Return 1 as default
+	else:		# Start to get the prime factors of number provided
+		counter = 0			# How many times the prime number is used as a divisor
+		for prime_number in prime_list:
+#			print
+#			print('+ n = {}'.format(n))
+#			print('+ prime_number = {}'.format(prime_number))
+			while (n % prime_number == 0):
+				if prime_number in count_of_prime:
+					count_of_prime[prime_number] = count_of_prime[prime_number] + 1
+				else:
+					count_of_prime[prime_number] = 1
+				counter += 1
+				n = n / prime_number
+			else:
+				if (counter):
+					counter = 0
+
+	print('count_of_prime = {}'.format(count_of_prime))
+    
+	# Format the output
+	prime_string = ''
+	for number, count in sorted(count_of_prime.items()):
+		print('building the string...')
+		if (count > 1):
+			print('count > 1')
+			prime_string += '({}**{})'.format(number, count)
+		else:
+			print('count !> 1')
+			prime_string += '({})'.format(number)
+	print('prime_string = {}'.format(prime_string))
+    
+	return prime_string
+
+# Get the next prime number that is after 'start', but before 'end'
+def getNextPrimeNumber(start, end):
+	next_prime = None
+
+	for p in range(start + 1, end):
+#		print('+ Checking Number = [{}]'.format(p))
+		if (isPrime(p, prime_list)):
+			next_prime = p
+			break
+
+	return next_prime
+
+# Function to get a list of prime numbers, up to the limit provided, by combining both options
+def createPrimeList(n):
+	method = '+ createPrimeList'
+#	print('{}: n = {}'.format(method, n))
+
+	prime_list = []
+
+	for t in range(1,n + 1):	# Go through the range of numbers that we want to check
+#		print
+#		print('{}: t = {}'.format(method, t))
+		if (prime_list):	# If the prime_list is not empty
+#			print('{}: prime_list has values: {}'.format(method, prime_list))
+			if (isPrimeWithList(t, prime_list)):
+#				print('{}: Using isPrimeWithList'.format(method))
+				prime_list.append(t)
+			if (t > prime_list[-1]):
+				if (isPrimeWithStart(t,prime_list[-1])):
+#					print('{}: Using isPrimeWithStart'.format(method))
+					prime_list.append(t)
+		else:				# If the prime list is empty
+#			print('{}: prime_list is empty'.format(method))
+			if (isPrime(t)):	# If the number we're testing is prime
+				prime_list.append(t)	# Then append the prime number to the prime numbers list
+
+	return prime_list
+
+# Function to check if a number is prime.  True = is prime.  False = is not prime
+def isPrimeWithStart(n, start):
+	method = 'isPrimeWithStart'
+#	print('+ {}: n = {}'.format(method, n))
+#	print('+ {}: start = {}'.format(method, start))
+	prime = False		# Assume the number is NOT prime
+
+	if (n > 3):
+		for t in range(start, n):
+#			print('+ {}: t = {}'.format(method, t))
+			if (n % t == 0):		# The number we're checking is divisible by another prime number
+#				print('+ {}: Prime = False'.format(method))
+				prime = False
+				break
+	elif (n <= 0):
+		prime = False
+
+	return prime
+
+# Function to check if a number is prime.  True = is prime.  False = is not prime
+def isPrimeWithList(n, prime_list):
+	method = 'isPrimeWithList'
+	prime = True		# Assume the number is prime
+
+	if (n > 3):
+		for p in prime_list:
+#			print('+ n = {}'.format(n))
+#			print('+ p = {}'.format(p))
+#			print('+ {} % {} = {}'.format(n, p, n % p))
+			if (n % p == 0 and p != 1 and n != p):		# The number we're checking is divisible by another prime number
+#				print('+ not prime')
+				prime = False
+				break
+			elif (n < p):	# If the number we want to check (n) is smaller than the prime divisor (p)
+				break		# Then break out - no sense testing (i.e. don't want to test 5 % 199)
+#			else:
+#				print('+ it is prime (so far...)')
+#			print
+	elif (n <= 0):
+		prime = False
+
+#	print('+ {}: {} is prime? {}'.format(method, n, prime))
+
+	return prime
+
+# Function to check if a number is prime.  True = is prime.  False = is not prime
+def isPrime(n):
+	prime = True		# Assume the number is prime
+
+	if (n > 3):
+		for t in range(2, n):
+			if (n % t == 0):		# The number we're checking is divisible by another prime number
+				prime = False
+				break
+	elif (n <= 0):
+		prime = False
 
 	return prime
