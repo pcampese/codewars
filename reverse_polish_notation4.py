@@ -9,11 +9,7 @@ def calc(expr):
 
 	# Put the expression into a list
 	expr_list = expr.split()
-	print('expr_list = <{}>'.format(expr_list))
 
-	# Define a list of valid operators
-	valid_operations_list = ['+', '-', '*', '/']
-	
 	# Define the operations
 	operation_of = {
 		'+': operator.add,	# Addition
@@ -23,20 +19,17 @@ def calc(expr):
 	}
 
 	# Define the regex string for the operators
-	pattern = '|'.join([re.escape(op) for op in valid_operations_list])
-	print('pattern = <{}>'.format(pattern))
+	pattern = '|'.join([re.escape(op) for op in operation_of.keys()])
 
-	# Count the number of operators in the expression (with finditer)
-	search_result = re.finditer(pattern, expr)
-	operator_list = [op.group() for op in search_result]
+	# Get the list of operators in the expression
+	operator_list = [op.group() for op in re.finditer(pattern, expr)]
 	print('operator_list = <{}>'.format(operator_list))
-	operator_count = len(operator_list)
-	print('operator_count = <{}>'.format(operator_count))
+		# 
 
 	# Evaluate the expression appropriately
 	if (not expr_list):					# If it's an empty expression
 		result = 0.0					# Answer = 0
-	elif (operator_count == 0):			# If there's no valid operator found
+	elif (len(operator_list) == 0):			# If there's no valid operator found
 		result = float(expr_list[-1])	# Answer = last number in the expression
 	elif (len(expr_list) >= 3):		# Valid expression if it has 3 or more elements
 		# It's valid - lets do math
