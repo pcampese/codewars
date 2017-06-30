@@ -7,44 +7,50 @@ def calc(expr):
 	# Print the arguments
 	print('expr = <{}>'.format(expr))
 
+	# Define the operations
+	operation_of = {
+		'+': operator.add,	# Addition
+		'-': operator.sub,	# Subtraction
+		'*': operator.mul,	# Multiplication
+		'/': operator.div	# Division
+	}
+
 	# Put the expression into a list
-	expr_list = expr.split()
-	print('expr_list = <{}>'.format(expr_list))
+	expr_list = [e if (e in operation_of.keys()) else float(e) for e in expr.split()]
+		# expr.split(): Convert the reverse polish notation to a list, split on spaces
+		# For each element in the expression, if it's operator, return back that same operator
+		# Otherwise, it's a number, so return a float version of that number
 
-	# Define a list of valid operators
-	operation_list = ['+', '-', '*', '/']
+	# Define the regex string for the operators
+	pattern = '|'.join([re.escape(op) for op in operation_of.keys()])
 
-	# Count the number of operators in the expression
-	operator_count = sum([expr_list.count(op) for op in operation_list])
-	print('operator_count = <{}>'.format(operator_count))
+	# Get the list of operators in the expression
+	operator_list = [op.group() for op in re.finditer(pattern, expr)]
+		# finditer returns an iterator of MatchObject; 1 MatchObject element for each operator found
+		# For each MatchObject element (i.e. operator) found, use group() to get the search result (i.e. the operator we did find)
+		# Save it in a list of objects
 
-	# Check for an empty expression
-	if (not expr_list):				# If it's an empty expression
-		result = 0.0					# Answer = 0
-	elif (operator_count == 0):		# If there's no valid operator found
-		result = float(expr_list[-1])		# Answer = last number
-	elif (len(expr_list) >= 3):		# Valid expression if it has 3 or more elements
+	# Evaluate the expression appropriately
+	if (not expr_list):					# If it's an empty expression
+		result = 0.0					# Answer = 0 (use 0.0 so it'll work with the float/int check at the end)
+	elif (not operator_list):			# If there's no valid operator found
+		result = expr_list[-1]			# Answer = last number in the expression
+	elif (len(expr_list) >= 3):			# Valid expression if it has 3 or more elements
 		# It's valid - lets do math
-		# Define the regex string for the operators
-		pattern = '|'.join([re.escape(op) for op in operation_list])
-		print('pattern = <{}>'.format(pattern))
-		print
+		for op in operator_list:				# For each operation that exists in the expression
+			index = expr_list.index(op) - 2		# Get the index of that operator.  Use -2, since all valid operations are in 3's. Elements shift left as they pop from left.
+			num1 = expr_list.pop(index)			# Get the 1st number
+			num2 = expr_list.pop(index)			# Get the 2nt number (same index since 1st number is popped)
+			expr_list.pop(index)				# Pop the expression, don't save - since we already have it (same index since 2nd number is popped)
 
-		# Find the first valid operator
-#		operation = min([expr_list.index(op) for op in operation_list])
+			# Do the math
+			operation = operation_of[op]		# Select which operation we need to do, from the dictionary
+			op_result = operation(num1, num2)	# Perform the operation
 
-		# Find the first operator using regex
-		search_result = re.search(pattern, expr)
-		operation = search_result.group()
-		operation_index = search_result.start()
+			# Insert the result back into the expression list
+			expr_list.insert(index, op_result)
 
-		# Get the numbers and operator and then remove them from the expression
-		num1 = expr[operation_index - 4]
-		num2 = expr[operation_index - 2]
-		expr = expr[operation_index - ]
-
-		print('operation = <{}>'.format(operation))
-		print('operation_index = <{}>'.format(operation_index))
+		result = expr_list[0]					# Answer is the final number that remains
 
 	# Convert final number to int, if appropriate
 	if result.is_integer():
