@@ -36,12 +36,18 @@ def calc(expr):
 		# Find the first operator using regex
 		search_result = re.search(pattern, expr)
 		operation = search_result.group()
-		operation_index = search_result.start()
+
+		# Convert the string into a list, split on spaces
+			# I'd like to find a way to a void this, if possible...
+		expr = expr.split()
+
+		# Get the index of the operator
+		operation_index = expr.index()
 
 		# Get the numbers and operator and then remove them from the expression
-		num1 = expr[operation_index - 4]
-		num2 = expr[operation_index - 2]
-		expr = expr[operation_index - ]
+		num1 = float(expr.pop(operation_index - 2))	# Get 1st number
+		num2 = float(expr.pop(operation_index - 2))	# Get 2nd number (it's in the same position as num1, since it was popped)
+		expr.pop(operation_index - 2)			# Pop operation (it's in the same position as num1, since it was popped).  No need to keep, already have it.
 
 		print('operation = <{}>'.format(operation))
 		print('operation_index = <{}>'.format(operation_index))
