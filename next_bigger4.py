@@ -27,30 +27,54 @@ def next_bigger(n):
 	# Get the number length
 	number_length = len(numbers)
 
-	# For length of 2
-	if (number_length == 2):
-		sorted_number = int(''.join([str(d) for d in sorted(numbers)]))
-		if (sorted_number > n):
-			result = sorted_number
-		else:
-			element = numbers.pop(1)
-			print(element)
-			numbers.insert(0, element)
-			print(numbers)
-			result = list_to_int(numbers)
-			print(result)
+	# Start from the right
+	# If the right 2 digits can be sorted, do it - then that should be the answer
+	# If the right 2 digits are already sorted,
+	#	Then find the smallest of the right 2 digits that is larger than the 3rd digit
+	#		Put that (minimally larger) digit into 3rd place.  Sort the remaining 2 digits from smallest to largest
+	#	If the right 2 digits don't have anything that's slightly larger than the 3rd digit (i.e. the right 3 digits are sorted largest to smallest)
+	#	Then repeat the process for the 4th digit...
+	#		Then find the smallest of the right 3 digits that is larger than the 4th digit
+	#			Put that (minimally larger) digit into 4th place.  Sort the remaining 3 digits from smallest to largest
+	#		If the right 3 digits don't have anything that's slightly larger than the 4th digit (i.e. the right 4 digits are sorted largest to smallest)
+	#		Then repeat the process for the 5th digit, etc...
 
-	# For length of 3
-	elif (number_length >= 3):
-		numbers_on_right = next_bigger(list_to_int(numbers[1:]))
-		if numbers_on_right >= 0:
-			result = list(str(numbers_on_right))
-			result.insert(0,numbers[0])
-			result = list_to_int(result)
+	if (number_length >= 2):
+		# Sort 2 digits on the right
+		test_number = list_to_int(numbers[:-2] + sorted(numbers[-2:], reverse=True))
+		print('test_number2 = {}'.format(test_number))
+
+		if (test_number > n):
+			result = test_number
+
+		# If the right 2 digits are already sorted,
+	if (number_length >= 3 and result == -1):
+		# 	Then find the smallest of the right 2 digits that is larger than the 3rd digit
+		digit, remaining_digits = next_largest(numbers[-3:])
+		test_number = list_to_int(list(digit) + remaining_digits)
+		print('test_number3 = {}'.format(test_number))
+
+		if (test_number > n):
+			result = test_number
+
 
 	print('result = {}'.format(result))
 
 	return result
+
+def next_largest(array):
+	number = array[0]			# The number to check against - find the next largest from the first element in the list
+	next_largest = max(array)	# Assume the next largest number is the max number remaining in the array - pop it out
+
+	for n in array:
+		if (number < n < next_largest):
+			next_largest = n
+
+	del array[array.index(next_largest)]	# Remove the next largest array
+	array.sort()							# Sort the array
+
+	# Return the next largest number, and the remaining array, with that next largest removed
+	return (n, array)
 
 def swap(array, item1, item2):
 	index_1 = array.index(item1)
