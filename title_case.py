@@ -1,6 +1,6 @@
 # https://www.codewars.com/kata/title-case/train/python
 
-def title_case(title, minor_words=None):
+def title_case(title, minor_words=''):
 	import string
 
 	# Print arguments
@@ -10,17 +10,12 @@ def title_case(title, minor_words=None):
 
 	# Verify if a non-empty title was passed
 	if (not title):
-		print('Empty title: <{}>'.format(title))
 		result = ''
 	else:
 		# The title is NOT empty
-		# Convert the provided arguments into lists
-		title = title.split()
-		if (minor_words != None):
-			minor_words = minor_words.split()
-		print('title = {}'.format(title))
-		print('minor_words = {}'.format(minor_words))
-		print
+		# Convert the provided arguments into lowercase lists
+		title = title.lower().split()
+		minor_words = minor_words.lower().split()
 
 		# Store the new title with correct case
 		new_title = []
@@ -29,10 +24,9 @@ def title_case(title, minor_words=None):
 		new_title.append(string.capitalize(title[0]))
 
 		# For all other words, capitalize first letter of word, unless the word
-		# is in the 'minor_words' list
+		# is in the 'minor_words' list (then leave it in all lowercase)
 		for word in title[1:]:
-			if (word.lower in )
-			if word not in minor_words:
+			if (word not in minor_words):
 				word = word.capitalize()
 			new_title.append(word)
 
