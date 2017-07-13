@@ -1,6 +1,8 @@
 # https://www.codewars.com/kata/range-extraction/train/python
 
 def solution(arr):
+	import pprint
+	
 	# Print arguments
 	print('arr ='.format(arr))
 	print
@@ -15,33 +17,38 @@ def solution(arr):
 	else:
 		# The list is long enough to do some analysis
 		# List to save the original list converted with the ranged numbers
-		range_list = []
-		result = ""
+		list_of_sequences = [[]]
+		result = []
 
-		# Walk through the list, excluding the last 2 numbers (since we want to
-		# guarantee three digits)
-		for index in xrange(0, length-2):
-			number = arr[index]
-			lookahead1 = arr[index+1]
-			lookahead2 = arr[index+2]
-			print('[number] lookahead1 and 2: [{}] {} {}'.format(number,
-																 lookahead1,
-																 lookahead2))
+		# Walk through the list, comparing the current number against a range
+		# buffer
+		for number in arr:
+			# Check if it's the first number
+			if (not list_of_sequences[-1]):
+				list_of_sequences[-1].append(number)
+				continue
 
-			# Check if the number with 2 lookaheads form a range
-			triple_range = [False for (a, b) in zip(xrange(number,number+3), arr[index:index+3]) if (a != b)]
-			if (False in triple_range):
-				# It is not a triple range
-				print('No.')
-				result += '{},'.format(number)
-				next()
+			# See if the number is exactly 1 + "most recent number"
+			if (number == list_of_sequences[-1][-1] + 1):
+				# Yes.  It's sequential
+				list_of_sequences[-1].append(number)
 			else:
-				# It is a triple range
-				print('Yes.')
-				result += '{}-'.format(number)
+				# No.  It's not sequential.  Generate a new list
+				list_of_sequences.append([number])
 
-			print('  |--> result = {}'.format(result))
-			print
+		# Generate the final list using the list_of_lists
+		for sequence in list_of_sequences:
+			if (len(sequence) <= 2):
+				# There aren't enough numbers to generate a sequence, so just
+				# append those numbers to the final result
+				result.extend([str(n) for n in sequence])
+			else:
+				# There are enough numbers for a sequence, so use the 1st and
+				# last numbers to define the sequence
+				result.append('{}-{}'.format(sequence[0], sequence[-1]))
+
+		# Join the final list
+		result = ','.join(result)
 
 	# Print the final results
 	print('result = {}'.format(result))
