@@ -1,115 +1,69 @@
+# https://www.codewars.com/kata/recover-a-secret-string-from-random-triplets/train/python
+
 def recoverSecret(triplets):
 	import pprint
-	import collections
-	import operator
 
 	# Print arguments
 	print('triplets = ')
 	pprint.pprint(triplets)
 	print
 
-	# Rotate the matrix
+	# Store the final phrase
+	phrase = []
+
+	# Rotate the triplets
 	rotated = list(zip(*triplets))
-	print('triplets rotated =')
-	pprint.pprint(rotated)
-	print
 
-	# Turn it into a list of sets
+	# Create a list of sets, used to find the first and last letters of the
+	# secret word
 	set_list = [set(row) for row in rotated]
-	print('set_list')
-	pprint.pprint(set_list)
-	print
 
-	# Get the first letter
+	# Get the first letter, and put it in as the first letter in the phrase
 	first = set_list[0] - set_list[1] - set_list[2]
-	print('first = {}'.format(first))
-	print
+	first = list(first)[0]
+	phrase.append([first])
 
 	# Get the last letter
 	last = set_list[2] - set_list[0] - set_list[1]
-	print('last = {}'.format(last))
-	print
+	last = list(last)[0]
 
-	# For each row (in the rotated triplet) (i.e. column in original triplet)
-	# get the set of each
-		
+	# Continue to loop and decode the secret word, until we break from inside
+	while True:
+		# Find all letters that might come after the latest set of possible
+		# letters.  We want to keep our "next options" stored in a set, since
+		# we want to ensure no duplicates are added.
+		next_options = set()
+		for letter in phrase[-1]:
+			for triplet in triplets:
+				if (triplet[0] == letter):
+					next_options.add(triplet[1])
+				elif (triplet[1] == letter):
+					next_options.add(triplet[2])
 
-	# Flatten the list
-	flat = []
-	for triplet in triplets:
-		flat.extend(triplet)
-	print('flat = {}'.format(flat))
-	print
+		# Convert the next possible options to a list, and append to the phrase.
+		next_options = list(next_options)
+		phrase.append(next_options)
 
-	# Try counting everything
-	count = dict(collections.Counter(flat))
-	print('count = ')
-	pprint.pprint(count)
-	print
+		# Remove stuff from the current phrase if it exists in the
+		# "next options" list.  Since we know it comes "next", that means it
+		# cannot stay in the current phrase, so get rid of it.
+		filtered_phrase = []
+		for letter_list in phrase[:-1]:
+			new_letter_list = [letter for letter in letter_list if letter not in phrase[-1]]
+			filtered_phrase.append(new_letter_list)
+		filtered_phrase.append(phrase[-1])
+		phrase = filtered_phrase
 
-	# Sort the count, based on values
-	count_sorted = sorted(count.iteritems(), key=operator.itemgetter(1), reverse=True)
-	print('count_sorted = ')
-	pprint.pprint(count_sorted)
-	print
+		# Once the last letter in the phrase matches what we know should be the
+		# last letter, get out.  We're done.
+		if (phrase[-1] == [last]):
+			break
 
-	return 0
-	
-	
-	
-	
-# w h a t i s u p
-  # ['t','u','p'],				t			u	p	
-  # ['w','h','i'],	w	h			i				
-  # ['t','s','u'],				t		s	u		
-  # ['a','t','s'],			a	t		s			
-  # ['h','a','p'],		h	a					p	
-  # ['t','i','s'],				t	i	s			
-  # ['w','h','s']		w	h				s			
+	# Convert the final result into a string
+	phrase = [letter_list[0] for letter_list in phrase]
+	phrase = ''.join(phrase)
 
-# w
-# w	h
-# w	h	a
-# w	h	a	t
-# w	h	a	t	u
-# w	h	a	t	u	p
-	# Need to fail here, because we already reached the last letter, but we still have unused letters: ['i', 's']
-# w	h	a	t	u
-	# No other options where 'u' is NOT the last letter.  Go backwards again
-# w	h	a	t	s
-# w	h	a	t	s	u
-# w	h	a	t	s	u	p
-# w	h	a	t	s	u
-	# No other options where 'u' is NOT the last letter.  Go backwards again
-# w	h	a	t	s
-	# No other options where 's' is NOT the last letter.  Go backwards again
-# w	h	a	t	i
-# w	h	a	t	i	s
-# w	h	a	t	i	s	u
-# w	h	a	t	i	s	u	p
-	# SOLVED
+	# Show the phrase
+	print('phrase = {}'.format(phrase))
 
-
-# m a t h i s f u n
-# [['t', 's', 'f'],			t			s	f			
- # ['a', 's', 'u'],		a				s		u		
- # ['m', 'a', 'f'],	m	a					f			
- # ['a', 'i', 'n'],		a			i				n	
- # ['s', 'u', 'n'],						s		u	n	
- # ['m', 'f', 'u'],	m						f	u		
- # ['a', 't', 'h'],		a	t	h						
- # ['t', 'h', 'i'],			t	h	i					
- # ['h', 'i', 'f'],				h	i		f			
- # ['m', 'h', 'f'],	m			h			f			
- # ['a', 'u', 'n'],		a						u	n	
- # ['m', 'a', 't'],	m	a	t							
- # ['f', 'u', 'n'],							f	u	n	
- # ['h', 's', 'n'],				h		s			n	
- # ['a', 'i', 's'],		a			i	s				
- # ['m', 's', 'n'],	m					s			n	
- # ['m', 's', 'u']]	m					s		u		
- 
-
-# l o v e
- # ['l', 'o', 'e'],	l	o		e
- # ['o', 'v', 'e']]		o	v	e
+	return phrase
